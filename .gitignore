@@ -8,6 +8,7 @@
 /Assets/Plugins/GitHub.meta
 /Assets/Plugins/GitHub/
 /Assets/AssetStoreTools*
+/rot_Data/
 
 # Visual Studio 2015 cache directory
 /.vs/
@@ -36,3 +37,7 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+#standalone exe
+rot.exe
+UnityPlayer.dll
