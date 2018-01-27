@@ -11,24 +11,45 @@ public class Coverage : MonoBehaviour {
     void Start () {
         if (Buildings == null)
             Buildings = GameObject.FindGameObjectWithTag("Buildings").GetComponent<Tilemap>();
-        Debug.Log(Buildings);
-        foreach (Tile t in Buildings.GetTilesBlock(Buildings.cellBounds))
+
+        BoundsInt bounds = Buildings.cellBounds;
+        TileBase[] allTiles = Buildings.GetTilesBlock(bounds);
+        Debug.Log("x bound size" + bounds.size.x);
+        Debug.Log("y bound size" + bounds.size.y);
+
+        for (int y = 0; y < bounds.size.y; y++)
         {
-            if (t && t.name.Contains("Base"))
+            for (int x = 0; x < bounds.size.x; x++)
+
             {
-                Debug.Log(t);
+                TileBase tile = allTiles[x + y * bounds.size.x];
+                if (tile && tile.name.Contains("Base"))
+                {
+                    Debug.Log("x:" + (x - (int)(bounds.size.x/2) + 1) + " y:" + (y - (int)(bounds.size.y / 2)) + " tile:" + tile.name);
+                    //THIS IS DONE BECAUSE X IS EVEN AND T IS ODD. PROBABLY.
+                    Vector3Int pos = new Vector3Int((x - (int)(bounds.size.x / 2) + 1), (y - (int)(bounds.size.y / 2)), 0);
+                    Vector3 worldPos = Buildings.GetCellCenterLocal(pos);
+                    //Debug.Log(worldPos);
+                    addNodes(worldPos, worldPos);
+                }
             }
         }
+        foreach(Vector3 pos in getActiveTowers())
+        {
+            Debug.Log("this is the starting postition:" + pos);
+        }
     }
+
+     
+
 	
 	// Update is called once per frame
 	void Update () {
-		
 	}
 
-public List<Vector3Int> getActiveTowers()
+public List<Vector3> getActiveTowers()
     {
-        List<Vector3Int> list = new List<Vector3Int>();
+        List<Vector3> list = new List<Vector3>();
         foreach (Link link in links) {
             if(!list.Contains(link.start))
             {
@@ -41,16 +62,23 @@ public List<Vector3Int> getActiveTowers()
         }
         return list;
     }
+
+    public void addNodes(Vector3 start, Vector3 end)
+    {
+        links.Add(new Link(start, end));
+    }
 }
 
+
 public class Link {
-    public Vector3Int start;
-    public Vector3Int end;
-    public Link(Vector3Int s, Vector3Int e)
+    public Vector3 start;
+    public Vector3 end;
+    public Link(Vector3 s, Vector3 e)
     {
         start = s;
         end = e;
     }
+
 }
 
 
