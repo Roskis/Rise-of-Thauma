@@ -6,44 +6,49 @@ public class LineRendererTest : MonoBehaviour
 {
     List<Vector3> linePoints = new List<Vector3>();
     LineRenderer lineRenderer;
-    public float startWidth = 1.0f;
-    public float endWidth = 1.0f;
     public float threshold = 0.001f;
     Camera thisCamera;
     int lineCount = 0;
 
     Vector3 lastPos = Vector3.one * float.MaxValue;
+    AnimationCurve curve = new AnimationCurve();
 
 
     void Awake()
     {
         thisCamera = Camera.main;
         lineRenderer = GetComponent<LineRenderer>();
+        curve.AddKey(0, 0.2f);
+        curve.AddKey(1, 0.2f);
     }
 
     void Update()
     {
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = thisCamera.nearClipPlane;
-        Vector3 mouseWorld = thisCamera.ScreenToWorldPoint(mousePos);
+        if (Input.GetMouseButtonDown(0))
+        {
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = thisCamera.nearClipPlane;
+            Vector3 mouseWorld = thisCamera.ScreenToWorldPoint(mousePos);
 
-        float dist = Vector3.Distance(lastPos, mouseWorld);
-        if (dist <= threshold)
-            return;
+            float dist = Vector3.Distance(lastPos, mouseWorld);
+            if (dist <= threshold)
+                return;
 
-        lastPos = mouseWorld;
-        if (linePoints == null)
-            linePoints = new List<Vector3>();
-        linePoints.Add(mouseWorld);
+            lastPos = mouseWorld;
+            if (linePoints == null)
+                linePoints = new List<Vector3>();
+            linePoints.Add(mouseWorld);
 
-        UpdateLine();
+            UpdateLine();
+        }
     }
 
 
     void UpdateLine()
     {
-        lineRenderer.SetWidth(startWidth, endWidth);
-        lineRenderer.SetVertexCount(linePoints.Count);
+        lineRenderer.widthCurve = curve;
+
+        lineRenderer.positionCount = linePoints.Count;
 
         for (int i = lineCount; i < linePoints.Count; i++)
         {

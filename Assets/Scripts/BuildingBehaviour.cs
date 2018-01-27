@@ -23,12 +23,12 @@ public class BuildingBehaviour : MonoBehaviour
             //Debug.Log("point: " + hit.point);
             Vector3Int cellPosition = tm.LocalToCell(hit.point);
             Debug.Log("cellPos" + cellPosition);
-            var pos = tm.GetCellCenterLocal(cellPosition);
+            //var pos = tm.GetCellCenterLocal(cellPosition);
             var clickedTile = tm.GetTile(cellPosition);
             var type = tm.GetSprite(cellPosition);
             //Debug.Log("Sprite: " + type);
             //Debug.Log("clickedTile: " + clickedTile);
-            Debug.Log("pos: " + pos);
+            //Debug.Log("pos: " + pos);
             //line.SetPosition(0, transform.position);
             //line.SetPosition(0, pos);
             //Gizmos.color = Color.blue;
