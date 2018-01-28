@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class GameManager : MonoBehaviour {
     public GameObject startTower;
@@ -9,24 +11,32 @@ public class GameManager : MonoBehaviour {
     public Sprite tower;
     public Sprite house;
     public Material lineMat;
+    public UnityEngine.UI.Text scoreText;
 
     //class variables
     private List<GameObject> activeTowers = new List<GameObject>();
     private GameObject lastClicked;
     private List<towerLink> links = new List<towerLink>();
     private GameObject lineRenderers;// = new GameObject();
+    private int points;
+
+    const int radius = 3;
 
     // Use this for initialization
     void Start () {
+        points = 0;
         Debug.Log("Start");
         //activeTowers = new List<GameObject>;
         activeTowers.Add(startTower);
+        CountNearbyHouses(startTower);
         foreach (Transform towerTransform in towers.transform)
         {
                 //Debug.Log(towerTransform.GameObject.name);
         }
         lineRenderers = new GameObject();
         lineRenderers.name = "lineRenderers";
+
+
     }
 
     public void towerhit(GameObject clickedTower)
@@ -34,9 +44,9 @@ public class GameManager : MonoBehaviour {
         if(!activeTowers.Contains(clickedTower) && lastClicked)
         {
             //Debug.Log("Yhdistä kaksi tornia: " + clickedTower + " yhdistettiin torniin " + lastClicked);
-            activeTowers.Add(clickedTower);
-            AddNodes(clickedTower, lastClicked);
+            ActivateNewTower(clickedTower);
             lastClicked = null;
+
         }
         else if (activeTowers.Contains(clickedTower))
         {
@@ -51,9 +61,29 @@ public class GameManager : MonoBehaviour {
 
     }
 
+    void ActivateNewTower(GameObject clickedTower)
+    {
+        activeTowers.Add(clickedTower);
+        AddNodes(clickedTower, lastClicked);
+        CountNearbyHouses(clickedTower);
+
+    }
+
+    void CountNearbyHouses(GameObject activeTower)
+    {
+        foreach (Transform h in houses.transform)
+        {
+            var dist = Vector3.Distance(activeTower.transform.position, h.transform.position);
+            if (dist < 3)
+            {
+                points++;
+                scoreText.text = "Score: " + points; 
+            }
+        }
+    }
+
     void Awake()
     {
-
 
     }
 
@@ -64,6 +94,7 @@ public class GameManager : MonoBehaviour {
             lastClicked = null;
             //Debug.Log("REMOVED ALL ACTIVE SELECTIONS.");
         }
+        
 	}
 
     public void AddNodes(GameObject start, GameObject end)
