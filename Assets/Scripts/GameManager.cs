@@ -8,10 +8,12 @@ public class GameManager : MonoBehaviour {
     public GameObject startTower;
     public GameObject towers;
     public GameObject houses;
+    public GameObject circles;
     public Material lineMat;
     public UnityEngine.UI.Text scoreText;
     public LineRenderer buildLine;
     public Collider bgCollider;
+    public Texture2D circle;
 
     //class variables
     private List<GameObject> activeTowers = new List<GameObject>();
@@ -30,6 +32,7 @@ public class GameManager : MonoBehaviour {
         money = 100.0f;
         //Debug.Log("Start");
         activeTowers.Add(startTower);
+        addCircle(startTower.transform.position, radius);
         CountNearbyHouses(startTower);
         setUpLineRenderers();
     }
@@ -44,6 +47,11 @@ public class GameManager : MonoBehaviour {
         buildLine.widthCurve = buildCurve;
         buildLine.SetPosition(0, new Vector3(0, 0, 0));
         buildLine.SetPosition(1, new Vector3(0, 0, 0));
+    }
+
+    void addCircle(Vector3 location, float r)
+    {
+        //Sprite c = Sprite.Create(circle, new Rect(0, 0, circle.width, circle.height), new Vector2(0.5f, 0.5f));
     }
 
     public void towerhit(GameObject clickedTower)

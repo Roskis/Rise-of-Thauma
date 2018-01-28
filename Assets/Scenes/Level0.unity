@@ -10186,6 +10186,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gm: {fileID: 2073338565}
+--- !u!1 &1330168535
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1330168536}
+  m_Layer: 0
+  m_Name: Circles
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1330168536
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1330168535}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.039156765, y: 0.06665924, z: -10.039335}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1386584878
 GameObject:
   m_ObjectHideFlags: 0
@@ -11081,10 +11109,12 @@ MonoBehaviour:
   startTower: {fileID: 346360882}
   towers: {fileID: 1133097841}
   houses: {fileID: 819773467}
+  circles: {fileID: 1330168535}
   lineMat: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   scoreText: {fileID: 1445320047}
   buildLine: {fileID: 2073338568}
   bgCollider: {fileID: 641166850}
+  circle: {fileID: 2800000, guid: 55b345b40aa44f3409402459f9c2b015, type: 3}
 --- !u!4 &2073338566
 Transform:
   m_ObjectHideFlags: 0
