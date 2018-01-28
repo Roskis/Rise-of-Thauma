@@ -10973,6 +10973,7 @@ MonoBehaviour:
   houses: {fileID: 819773467}
   tower: {fileID: 21300000, guid: 86afe22102adc4f4e8ad1f0ff7f5229b, type: 3}
   house: {fileID: 21300000, guid: c3e0014d56f894e4dbf90e6cadd3707c, type: 3}
+  lineMat: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!4 &2073338566
 Transform:
   m_ObjectHideFlags: 0
