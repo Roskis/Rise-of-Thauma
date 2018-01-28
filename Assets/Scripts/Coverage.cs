@@ -14,8 +14,8 @@ public class Coverage : MonoBehaviour {
 
         BoundsInt bounds = Buildings.cellBounds;
         TileBase[] allTiles = Buildings.GetTilesBlock(bounds);
-        Debug.Log("x bound size" + bounds.size.x);
-        Debug.Log("y bound size" + bounds.size.y);
+        //Debug.Log("x bound size" + bounds.size.x);
+        //Debug.Log("y bound size" + bounds.size.y);
 
         for (int y = 0; y < bounds.size.y; y++)
         {
@@ -25,7 +25,7 @@ public class Coverage : MonoBehaviour {
                 TileBase tile = allTiles[x + y * bounds.size.x];
                 if (tile && tile.name.Contains("Base"))
                 {
-                    Debug.Log("x:" + (x - (int)(bounds.size.x/2) + 1) + " y:" + (y - (int)(bounds.size.y / 2)) + " tile:" + tile.name);
+                    //Debug.Log("x:" + (x - (int)(bounds.size.x/2) + 1) + " y:" + (y - (int)(bounds.size.y / 2)) + " tile:" + tile.name);
                     //THIS IS DONE BECAUSE X IS EVEN AND T IS ODD. PROBABLY.
                     Vector3Int pos = new Vector3Int((x - (int)(bounds.size.x / 2) + 1), (y - (int)(bounds.size.y / 2)), 0);
                     Vector3 worldPos = Buildings.GetCellCenterLocal(pos);
@@ -36,11 +36,9 @@ public class Coverage : MonoBehaviour {
         }
         foreach(Vector3 pos in getActiveTowers())
         {
-            Debug.Log("this is the starting postition:" + pos);
+            //Debug.Log("this is the starting postition:" + pos);
         }
     }
-
-     
 
 	
 	// Update is called once per frame

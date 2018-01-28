@@ -10,7 +10,6 @@ public class BuildingBehaviour : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
     }
 
     void OnMouseDown()
@@ -19,10 +18,10 @@ public class BuildingBehaviour : MonoBehaviour
         if (hit.collider != null)
         {
             Tilemap tm = hit.collider.gameObject.GetComponent<Tilemap>();
-            Debug.Log(tm);
+            //Debug.Log(tm);
             //Debug.Log("point: " + hit.point);
             Vector3Int cellPosition = tm.LocalToCell(hit.point);
-            Debug.Log("cellPos" + cellPosition);
+            //Debug.Log("cellPos" + cellPosition);
             //var pos = tm.GetCellCenterLocal(cellPosition);
             var clickedTile = tm.GetTile(cellPosition);
             var type = tm.GetSprite(cellPosition);
