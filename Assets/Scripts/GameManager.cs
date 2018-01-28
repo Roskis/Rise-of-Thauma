@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour {
     public LineRenderer buildLine;
     public Collider bgCollider;
     public Texture2D circle;
+    public Sprite greenCircle;
 
     //class variables
     private List<GameObject> activeTowers = new List<GameObject>();
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour {
     private int points;
     private float money;
     private AnimationCurve buildCurve = new AnimationCurve();
+    private Sprite circleSprite;
 
     const int radius = 3;
 
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviour {
         addCircle(startTower.transform.position, radius);
         CountNearbyHouses(startTower);
         setUpLineRenderers();
+        Sprite circleSprite = Sprite.Create(circle, new Rect(0, 0, circle.width, circle.height), new Vector2(0.5f, 0.5f));
     }
 
     void setUpLineRenderers()
@@ -51,7 +54,16 @@ public class GameManager : MonoBehaviour {
 
     void addCircle(Vector3 location, float r)
     {
-        //Sprite c = Sprite.Create(circle, new Rect(0, 0, circle.width, circle.height), new Vector2(0.5f, 0.5f));
+        GameObject newSpriteObject = new GameObject();
+        newSpriteObject.name = "spriterendererobject";
+        newSpriteObject.transform.parent = circles.transform;
+
+        SpriteRenderer spriteR = newSpriteObject.AddComponent<SpriteRenderer>();
+        spriteR.sprite = greenCircle;
+        spriteR.sortingOrder = 3;
+        spriteR.color = new Color(1.0f, 1.0f, 1.0f, 0.2f);
+        spriteR.transform.localScale = new Vector3(r / 2.5f, r / 2.5f, 1.0f);
+        spriteR.transform.position = location;
     }
 
     public void towerhit(GameObject clickedTower)
@@ -85,6 +97,7 @@ public class GameManager : MonoBehaviour {
         AddNodes(clickedTower, lastClicked);
         CountNearbyHouses(clickedTower);
         money -= Vector3.Distance(clickedTower.transform.position, lastClicked.transform.position);
+        addCircle(clickedTower.transform.position, radius);
     }
 
     void updateScoreText()
