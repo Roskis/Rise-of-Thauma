@@ -5,12 +5,15 @@ using UnityEngine;
 
 public class MousePoint : MonoBehaviour
 {
+    public Collider collider;
+
     void OnMouseDown()
     {
-        RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, Mathf.Infinity, 512);
-        if (hit.collider != null)
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (collider.Raycast(ray, out hit, 100.0f))
         {
-            Debug.Log("mouse : " + hit.point);
+            //Debug.Log("hit: " + hit.point);
         }
     }
 }

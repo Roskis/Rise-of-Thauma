@@ -8,35 +8,42 @@ public class GameManager : MonoBehaviour {
     public GameObject startTower;
     public GameObject towers;
     public GameObject houses;
-    public Sprite tower;
-    public Sprite house;
     public Material lineMat;
     public UnityEngine.UI.Text scoreText;
+    public LineRenderer buildLine;
+    public Collider bgCollider;
 
     //class variables
     private List<GameObject> activeTowers = new List<GameObject>();
     private GameObject lastClicked;
     private List<towerLink> links = new List<towerLink>();
-    private GameObject lineRenderers;// = new GameObject();
+    private GameObject lineRenderers;
     private int points;
+    private float money;
+    private AnimationCurve buildCurve = new AnimationCurve();
 
     const int radius = 3;
 
     // Use this for initialization
     void Start () {
         points = 0;
-        Debug.Log("Start");
-        //activeTowers = new List<GameObject>;
+        money = 100.0f;
+        //Debug.Log("Start");
         activeTowers.Add(startTower);
         CountNearbyHouses(startTower);
-        foreach (Transform towerTransform in towers.transform)
-        {
-                //Debug.Log(towerTransform.GameObject.name);
-        }
+        setUpLineRenderers();
+    }
+
+    void setUpLineRenderers()
+    {
         lineRenderers = new GameObject();
         lineRenderers.name = "lineRenderers";
 
-
+        buildCurve.AddKey(0, 0.2f);
+        buildCurve.AddKey(1, 0.2f);
+        buildLine.widthCurve = buildCurve;
+        buildLine.SetPosition(0, new Vector3(0, 0, 0));
+        buildLine.SetPosition(1, new Vector3(0, 0, 0));
     }
 
     public void towerhit(GameObject clickedTower)
@@ -44,9 +51,12 @@ public class GameManager : MonoBehaviour {
         if(!activeTowers.Contains(clickedTower) && lastClicked)
         {
             //Debug.Log("Yhdistä kaksi tornia: " + clickedTower + " yhdistettiin torniin " + lastClicked);
-            ActivateNewTower(clickedTower);
-            lastClicked = null;
-
+            float dist = Vector3.Distance(lastClicked.transform.position, clickedTower.transform.position);
+            if (money - dist >= 0.0f)
+            {
+                ActivateNewTower(clickedTower);
+                lastClicked = null;
+            }
         }
         else if (activeTowers.Contains(clickedTower))
         {
@@ -66,7 +76,20 @@ public class GameManager : MonoBehaviour {
         activeTowers.Add(clickedTower);
         AddNodes(clickedTower, lastClicked);
         CountNearbyHouses(clickedTower);
+        money -= Vector3.Distance(clickedTower.transform.position, lastClicked.transform.position);
+    }
 
+    void updateScoreText()
+    {
+        if (lastClicked)
+        {
+            float dist = Vector3.Distance(lastClicked.transform.position, getMousePos());
+            scoreText.text = "Score: " + points + " Money: " + money.ToString("n1") + " (Cost: " + dist.ToString("n1") + ")";
+        }
+        else
+        {
+            scoreText.text = "Score: " + points + " Money: " + money.ToString("n1");
+        }
     }
 
     void CountNearbyHouses(GameObject activeTower)
@@ -77,14 +100,36 @@ public class GameManager : MonoBehaviour {
             if (dist < 3)
             {
                 points++;
-                scoreText.text = "Score: " + points; 
             }
         }
     }
 
-    void Awake()
+    Vector3 getMousePos()
     {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (bgCollider.Raycast(ray, out hit, 100.0f))
+        {
+            return hit.point;
+        }
+        else
+        {
+            return new Vector3(0, 0, 0);
+        }
+    }
 
+    void drawBuildLine()
+    {
+        if (lastClicked)
+        {
+            buildLine.SetPosition(0, lastClicked.transform.position);
+            buildLine.SetPosition(1, getMousePos());
+        }
+        else
+        {
+            buildLine.SetPosition(0, new Vector3(0, 0, 0));
+            buildLine.SetPosition(1, new Vector3(0, 0, 0));
+        }
     }
 
     // Update is called once per frame
@@ -94,8 +139,9 @@ public class GameManager : MonoBehaviour {
             lastClicked = null;
             //Debug.Log("REMOVED ALL ACTIVE SELECTIONS.");
         }
-        
-	}
+        drawBuildLine();
+        updateScoreText();
+    }
 
     public void AddNodes(GameObject start, GameObject end)
     {
@@ -123,7 +169,7 @@ public class towerLink
         lineRenderer = lr;
         curve.AddKey(0, 0.2f);
         curve.AddKey(1, 0.2f);
-        Debug.Log(lineRenderer);
+        //Debug.Log(lineRenderer);
         lineRenderer.widthCurve = curve;
         lineRenderer.material = new Material(lineMat);
         lineRenderer.SetPosition(0, start.transform.position);
