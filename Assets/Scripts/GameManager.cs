@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour {
 
     const int radius = 3;
 
+    bool onIncreaseMoney = false;    
+
     // Use this for initialization
     void Start () {
         points = 0;
@@ -153,16 +155,28 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    IEnumerator IncreaseMoney()
+    {
+        money += points * 0.5f;
+        yield return new WaitForSeconds(1);
+        onIncreaseMoney = false;
+    }
 
-        // Update is called once per frame
-        void Update () {
-		if(Input.GetMouseButtonDown(1))
-        {
-            lastClicked = null;
-            //Debug.Log("REMOVED ALL ACTIVE SELECTIONS.");
-        }
-        drawBuildLine();
-        updateScoreText();
+
+    // Update is called once per frame
+    void Update () {
+	if(Input.GetMouseButtonDown(1))
+    {
+        lastClicked = null;
+    }
+    drawBuildLine();
+    updateScoreText();
+    if (!onIncreaseMoney) {
+        onIncreaseMoney = true;
+        StartCoroutine("IncreaseMoney");
+    }
+
+
     }
 
     public void AddNodes(GameObject start, GameObject end)
