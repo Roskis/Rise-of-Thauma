@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour {
         money = 100.0f;
         //Debug.Log("Start");
         activeTowers.Add(startTower);
-        addCircle(startTower.transform.position, radius);
+        addCircle(startTower.transform.position, radius, startTower);
         CountNearbyHouses(startTower);
         setUpLineRenderers();
         Sprite circleSprite = Sprite.Create(circle, new Rect(0, 0, circle.width, circle.height), new Vector2(0.5f, 0.5f));
@@ -54,11 +54,11 @@ public class GameManager : MonoBehaviour {
         buildLine.SetPosition(1, new Vector3(0, 0, 0));
     }
 
-    void addCircle(Vector3 location, float r)
+    void addCircle(Vector3 location, float r, GameObject addTower)
     {
         GameObject newSpriteObject = new GameObject();
         newSpriteObject.name = "spriterendererobject";
-        newSpriteObject.transform.parent = circles.transform;
+        newSpriteObject.transform.parent = addTower.transform;
 
         SpriteRenderer spriteR = newSpriteObject.AddComponent<SpriteRenderer>();
         spriteR.sprite = greenCircle;
@@ -93,13 +93,30 @@ public class GameManager : MonoBehaviour {
 
     }
 
+    void DeleteActiveTower(GameObject removeTower)
+    {
+        activeTowers.Remove(removeTower);
+        points += CountNearbyHouses(removeTower);
+        foreach(var t in links)
+        {
+            if (t.start == removeTower || t.end == removeTower)
+            {
+                links.Remove(t);
+            }
+        }
+        foreach(Transform child in removeTower.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+    }
+
     void ActivateNewTower(GameObject clickedTower)
     {
         activeTowers.Add(clickedTower);
         AddNodes(clickedTower, lastClicked);
-        CountNearbyHouses(clickedTower);
+        points += CountNearbyHouses(clickedTower);
         money -= Vector3.Distance(clickedTower.transform.position, lastClicked.transform.position);
-        addCircle(clickedTower.transform.position, radius);
+        addCircle(clickedTower.transform.position, radius, clickedTower);
     }
 
     void updateScoreText()
@@ -115,16 +132,18 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    void CountNearbyHouses(GameObject activeTower)
+    int CountNearbyHouses(GameObject activeTower)
     {
+        int numHouses = 0;
         foreach (Transform h in houses.transform)
         {
             var dist = Vector3.Distance(activeTower.transform.position, h.transform.position);
             if (dist < 3)
             {
-                points++;
+                numHouses++;
             }
         }
+        return numHouses;
     }
 
     Vector3 getMousePos()
@@ -155,6 +174,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+
     IEnumerator IncreaseMoney()
     {
         money += points * 0.5f;
@@ -169,6 +189,7 @@ public class GameManager : MonoBehaviour {
     {
         lastClicked = null;
     }
+
     drawBuildLine();
     updateScoreText();
     if (!onIncreaseMoney) {
