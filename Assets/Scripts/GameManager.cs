@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour {
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (bgCollider.Raycast(ray, out hit, 100.0f))
+        if (bgCollider.Raycast(ray, out hit, 300.0f))
         {
             return hit.point;
         }
