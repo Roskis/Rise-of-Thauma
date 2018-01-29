@@ -153,8 +153,9 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    // Update is called once per frame
-    void Update () {
+
+        // Update is called once per frame
+        void Update () {
 		if(Input.GetMouseButtonDown(1))
         {
             lastClicked = null;
