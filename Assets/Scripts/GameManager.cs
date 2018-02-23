@@ -201,9 +201,11 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator IncreaseMoney()
     {
+
         money += points * 0.25f;
         yield return new WaitForSeconds(1);
         onIncreaseMoney = false;
+
     }
 
 
