@@ -15,6 +15,15 @@ public class Towers : MonoBehaviour {
 		
 	}
 
+    void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            gm.DeactivateTower(this.gameObject);
+        }
+        
+    }
+
     void OnMouseDown()
     {
         gm.towerhit(this.gameObject);

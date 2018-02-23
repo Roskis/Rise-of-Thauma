@@ -6,9 +6,8 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
     public GameObject startTower;
-    public GameObject towers;
+    public GameObject inactiveTowers;
     public GameObject houses;
-    public GameObject circles;
     public Material lineMat;
     public UnityEngine.UI.Text scoreText;
     public LineRenderer buildLine;
@@ -17,10 +16,7 @@ public class GameManager : MonoBehaviour {
     public Sprite greenCircle;
 
     //class variables
-    private List<GameObject> activeTowers = new List<GameObject>();
     private GameObject lastClicked;
-    private List<towerLink> links = new List<towerLink>();
-    private GameObject lineRenderers;
     private int points;
     private float money;
     private AnimationCurve buildCurve = new AnimationCurve();
@@ -35,29 +31,31 @@ public class GameManager : MonoBehaviour {
         points = 0;
         money = 100.0f;
         //Debug.Log("Start");
-        activeTowers.Add(startTower);
+        //activeTowers.Add(startTower);
         addCircle(startTower.transform.position, radius, startTower);
         CountNearbyHouses(startTower);
-        setUpLineRenderers();
+        SetUpBuildLine();
         Sprite circleSprite = Sprite.Create(circle, new Rect(0, 0, circle.width, circle.height), new Vector2(0.5f, 0.5f));
+        
     }
 
-    void setUpLineRenderers()
-    {
-        lineRenderers = new GameObject();
-        lineRenderers.name = "lineRenderers";
 
+    void SetUpBuildLine()
+    {
+   
         buildCurve.AddKey(0, 0.2f);
         buildCurve.AddKey(1, 0.2f);
         buildLine.widthCurve = buildCurve;
         buildLine.SetPosition(0, new Vector3(0, 0, 0));
         buildLine.SetPosition(1, new Vector3(0, 0, 0));
+
     }
+
 
     void addCircle(Vector3 location, float r, GameObject addTower)
     {
         GameObject newSpriteObject = new GameObject();
-        newSpriteObject.name = "spriterendererobject";
+        newSpriteObject.name = "circle";
         newSpriteObject.transform.parent = addTower.transform;
 
         SpriteRenderer spriteR = newSpriteObject.AddComponent<SpriteRenderer>();
@@ -68,56 +66,79 @@ public class GameManager : MonoBehaviour {
         spriteR.transform.position = location;
     }
 
+
     public void towerhit(GameObject clickedTower)
     {
-        if(!activeTowers.Contains(clickedTower) && lastClicked)
+
+        if (IsActive(lastClicked) && !IsActive(clickedTower))
         {
-            //Debug.Log("Yhdistä kaksi tornia: " + clickedTower + " yhdistettiin torniin " + lastClicked);
-            float dist = Vector3.Distance(lastClicked.transform.position, clickedTower.transform.position);
-            if (money - dist >= 0.0f)
+            if (money > Vector3.Distance(clickedTower.transform.position, lastClicked.transform.position))
             {
-                ActivateNewTower(clickedTower);
+                //Debug.Log("Yhdistä kaksi tornia: " + clickedTower + " yhdistettiin torniin " + lastClicked);
+                ActivateTower(clickedTower);
                 lastClicked = null;
-            }
-        }
-        else if (activeTowers.Contains(clickedTower))
-        {
-            lastClicked = clickedTower;
-            //Debug.Log("this " + clickedTower + " is now selected");
-        }
-        else
-        {
-            lastClicked = null;
-            //Debug.Log("no active tower has been selected.");
-        }
-
-    }
-
-    void DeleteActiveTower(GameObject removeTower)
-    {
-        activeTowers.Remove(removeTower);
-        points += CountNearbyHouses(removeTower);
-        foreach(var t in links)
-        {
-            if (t.start == removeTower || t.end == removeTower)
+            } else
             {
-                links.Remove(t);
+                Debug.Log("sorry you're too poor.");
             }
-        }
-        foreach(Transform child in removeTower.transform)
+        } else if (IsActive(clickedTower))
         {
-            GameObject.Destroy(child.gameObject);
+            //Debug.Log("this " + clickedTower + " is now selected");
+            lastClicked = clickedTower;
+        } else
+        {
+            //Debug.Log("no active tower has been selected.");
+            lastClicked = null;
         }
+
+    }
+    
+
+    bool IsActive(GameObject tower)
+    {
+
+        if (tower == null) return false;
+        if (tower == startTower) return true;
+        return (tower.transform.root.gameObject == startTower);
+
     }
 
-    void ActivateNewTower(GameObject clickedTower)
+    void ActivateTower(GameObject clickedTower)
     {
-        activeTowers.Add(clickedTower);
-        AddNodes(clickedTower, lastClicked);
+
+        clickedTower.transform.parent = lastClicked.transform;
+        DrawLine(lastClicked, clickedTower);
         points += CountNearbyHouses(clickedTower);
         money -= Vector3.Distance(clickedTower.transform.position, lastClicked.transform.position);
         addCircle(clickedTower.transform.position, radius, clickedTower);
+
     }
+
+
+    public void DeactivateTower(GameObject tower)
+    {
+        if (tower == startTower)
+            return;
+
+        List<GameObject> toBeDeleted = new List<GameObject>();
+        foreach (Transform child in tower.gameObject.transform)
+        {
+            if (child.gameObject.name.Contains("tower"))
+            {
+                toBeDeleted.Add(child.gameObject);
+            }
+        }
+
+        foreach (GameObject d in toBeDeleted) {
+            DeactivateTower(d);
+        }
+
+        tower.transform.parent = inactiveTowers.transform;
+        Destroy(tower.gameObject.GetComponent<LineRenderer>());
+        Destroy(tower.gameObject.transform.Find("circle").gameObject);
+
+    }
+
 
     void updateScoreText()
     {
@@ -131,6 +152,7 @@ public class GameManager : MonoBehaviour {
             scoreText.text = "Score: " + points + " Money: " + money.ToString("n1");
         }
     }
+
 
     int CountNearbyHouses(GameObject activeTower)
     {
@@ -146,6 +168,7 @@ public class GameManager : MonoBehaviour {
         return numHouses;
     }
 
+
     Vector3 getMousePos()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -159,6 +182,7 @@ public class GameManager : MonoBehaviour {
             return new Vector3(0, 0, 0);
         }
     }
+
 
     void drawBuildLine()
     {
@@ -177,7 +201,7 @@ public class GameManager : MonoBehaviour {
 
     IEnumerator IncreaseMoney()
     {
-        money += points * 0.5f;
+        money += points * 0.25f;
         yield return new WaitForSeconds(1);
         onIncreaseMoney = false;
     }
@@ -185,52 +209,33 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-	if(Input.GetMouseButtonDown(1))
+	    if(Input.GetMouseButtonDown(1))
+        {
+            lastClicked = null;
+        }
+
+        drawBuildLine();
+        updateScoreText();
+
+        if (!onIncreaseMoney) {
+            onIncreaseMoney = true;
+            StartCoroutine("IncreaseMoney");
+        }
+
+    }
+
+
+
+    public void DrawLine(GameObject start, GameObject end)
     {
-        lastClicked = null;
-    }
-
-    drawBuildLine();
-    updateScoreText();
-    if (!onIncreaseMoney) {
-        onIncreaseMoney = true;
-        StartCoroutine("IncreaseMoney");
-    }
-
-
-    }
-
-    public void AddNodes(GameObject start, GameObject end)
-    {
-        GameObject newLRObject = new GameObject();
-        newLRObject.name = "linerendererobject";
-        newLRObject.transform.parent = lineRenderers.transform;
-
-        LineRenderer lineR = newLRObject.AddComponent<LineRenderer>();
-        links.Add(new towerLink(start, end, lineR, lineMat));
-    }
-}
-
-public class towerLink
-{
-    public GameObject start;
-    public GameObject end;
-
-    private LineRenderer lineRenderer;
-    private AnimationCurve curve = new AnimationCurve();
-
-    public towerLink(GameObject s, GameObject e, LineRenderer lr, Material lineMat)
-    {
-        start = s;
-        end = e;
-        lineRenderer = lr;
+        LineRenderer lineR = end.AddComponent<LineRenderer>();
+        AnimationCurve curve = new AnimationCurve();
         curve.AddKey(0, 0.2f);
         curve.AddKey(1, 0.2f);
-        //Debug.Log(lineRenderer);
-        lineRenderer.widthCurve = curve;
-        lineRenderer.material = new Material(lineMat);
-        lineRenderer.SetPosition(0, start.transform.position);
-        lineRenderer.SetPosition(1, end.transform.position);
-        lineRenderer.sortingOrder = 2;
+        lineR.widthCurve = curve;
+        lineR.material = new Material(lineMat);
+        lineR.SetPosition(0, start.transform.position);
+        lineR.SetPosition(1, end.transform.position);
+        lineR.sortingOrder = 2;
     }
 }
